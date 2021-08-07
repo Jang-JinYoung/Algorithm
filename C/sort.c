@@ -23,6 +23,13 @@ void main()
 
 	bubble_sort(nums, n);
 
+	for (int i = 0; i < n; i++)
+	{
+		printf("%d ", nums[i]);
+		if(i % 100 == 0 && i != 0)
+			printf("\n")
+	}
+
 
 }
 
@@ -66,7 +73,7 @@ void bubble_sort(int nums[], int n)
 
 	for (int i = n - 1; i > 0; i--)
 	{
-		for (int j = 0; j < 1; j++) {
+		for (int j = 0; j < i; j++) {
 			if (nums[j] > nums[j + 1])
 			{
 				SWAP(nums[j], nums[j + 1], temp);
