@@ -42,7 +42,7 @@ element delete_max_heap(HeapType* h) {
 		//현재 노드의 자식 노드 중 더 큰 자식 노드를 찾는다.
 		if ((child < h->heap_size) && (h->heap[child].key) > h->heap[child + 1].key)
 			child++;
-		if (temp.key <= h->heap[child].key) 
+		if (temp.key <= h->heap[child].key)
 			break;
 
 		h->heap[parent] = h->heap[child];
@@ -61,7 +61,7 @@ void print_heap(HeapType* h) {
 	}
 	printf("\n");
 }
-WW
+
 //메인 함수
 int main() {
 	element e1 = { 10 }, e2 = { 5 }, e3 = { 30 };
@@ -70,9 +70,9 @@ int main() {
 
 	init(&heap);
 
-	insert_max_heap(&heap, e1);
-	insert_max_heap(&heap, e2);
-	insert_max_heap(&heap, e3);
+	insert_min_heap(&heap, e1);
+	insert_min_heap(&heap, e2);
+	insert_min_heap(&heap, e3);
 	print_heap(&heap);
 
 	e4 = delete_max_heap(&heap);
