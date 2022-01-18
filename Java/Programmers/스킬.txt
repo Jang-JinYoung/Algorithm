@@ -1,0 +1,25 @@
+* 배열 최대값 구하기
+Arrays.stream(배열).max().getAsInt();
+
+* 2차원 배열 정렬
+Arrays.sort(배열, (o1 - o2) -> o1[0], o2[0]);
+
+* String.indexOf
+"ABC".indexOf("") => 0 (공백은 0반환하는듯.)
+"ABC".indexOf("A") => 0
+"ABC".indexOf("AB) => 0 (0에서부터 A가 있다)
+"ABC".indexOf("B") => 1
+
+* 정수 2진법 문자열로 만들기
+String binary = Integer.toBinaryString(123);
+
+* 배열 중복 제거 후 리스트로 만들기
+List<String> list = Arrays.stream(arr).distinct().collect(Collectors.toList());
+
+* 문자열 배열 -> 정수형 배열
+Integer [] nums = Stream.of(s.split(" ")).mapToInt(Integer::parseInt).boxed().toArray(Integer[]::new);
+Integer[] nums = Stream.of(arr).mapToInt(Integer::parseInt).boxed().toArray(Integer[]::new);
+
+* 최소 최대 구하기
+Arrays.stream(nums).min(Integer::compareTo).get()
+Arrays.stream(nums).max(Integer::compareTo).get();
