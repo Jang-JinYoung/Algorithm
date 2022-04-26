@@ -1,0 +1,344 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+#define BUCKETS 10
+#define SWAP(x,y,t) ( (t) = (x), (x) = (y), (y)=(t))
+
+typedef struct QueueNode {
+	int item;
+	struct QueueNode* link;
+}QueueNode;
+
+typedef struct  {
+	QueueNode* front, * rear;
+}QueueType;
+
+int* setArray(int size);
+void printArray(int arr[], int size);
+void insertion_sort(int arr[], int size);
+
+void bubble_sort(int arr[], int size);
+
+void merge_sort(int arr[], int left, int right, int sorted[]);
+void merge(int arr[], int left, int mid, int right, int sorted[]);
+
+void quick_sort(int arr[], int start, int end);
+
+//기수정렬
+void init(QueueType* q);
+int is_empty(QueueType* q);
+void enqueue(QueueType* q, int item);
+int dequeue(QueueType* q);
+void radix_sort(int arr[], int size);
+
+void bucket_sort(int arr[], int size);
+
+void main()
+{
+	int* arr;
+	int* sorted; // mergeSort
+	double start, end;
+	int size[3] = { 1000, 5000, 10000 };
+
+	// insertSort
+	printf("insertSort runnig times ----\n");
+	for (int i = 0; i < 3; i++) {
+		insertion_sort(setArray(size[i]), size[i]);
+	}
+	
+	// bubbleSort
+	printf("\nbubbleSort runnig times ----\n");
+	for (int i = 0; i < 3; i++) {
+		bubble_sort(setArray(size[i]), size[i]);
+	}
+
+	// mergeSort
+	printf("\nmergeSort running times ---> \n");
+	for (int i = 0; i < 3; i++) {
+		arr = setArray(size[i]);
+		//printArray(arr, size[i]);
+		start = (double)clock() / CLOCKS_PER_SEC;
+		merge_sort(arr, 0, size[i], setArray(size[i]));
+		end = (((double)clock()) / CLOCKS_PER_SEC);
+		printf("size :%d running time : %f\n", size[i], end - start);
+		//printArray(arr, size[i]);
+	}
+
+	//quickSort -> 주의!!!!!!!!!! 1, 2는 죽으니까 0만테스트하세요
+	printf("\nquickSort running times ---> \n");
+	for (int i = 0; i < 1; i++) {
+		arr = setArray(size[i]);
+		//printArray(arr, size[i]);
+		start = (double)clock() / CLOCKS_PER_SEC;
+		quick_sort(arr, 0, size[i] - 1);
+		end = (((double)clock()) / CLOCKS_PER_SEC);
+		printf("size :%d running time : %f\n", size[i], end - start);
+		//printArray(arr, size[i]);
+	} 
+	//radixSort
+	printf("\nradixSort running times ---: \n");
+	for (int i = 0; i < 3; i++) {
+		radix_sort(setArray(size[i]), size[i]);
+	}
+
+	//bucketSort
+	printf("\nbucketSort running times ---> \n");
+	for (int i = 0; i < 3; i++) {
+		bucket_sort(setArray(size[i]), size[i]);
+	}
+}
+
+int* setArray(int size)
+{
+	int* arr = (int*)malloc(sizeof(int) * size);
+
+	for (int i = 0; i < size; i++)
+	{// size, size-1, ..., 0
+		arr[i] = size - i;
+	}
+	return arr;
+}
+
+void printArray(int arr[], int size) {
+	for (int i = 0; i < size; i++) {
+		printf("%d ", arr[i]);
+	}
+}
+
+//삽입 정렬 -> 최선 O(n) 최악 O(n²)
+void insertion_sort(int arr[], int size)
+{
+	int i, j, key;
+	double start, end;
+
+	//printArray(arr, size);
+	start = (double)clock() / CLOCKS_PER_SEC;
+	for (i = 1; i < size; i++)
+	{
+		key = arr[i];
+		for (j = i - 1; j >= 0 && arr[j] > key; j--)
+		{
+			arr[j + 1] = arr[j];
+		}
+		arr[j + 1] = key;
+	}
+	end = (((double)clock()) / CLOCKS_PER_SEC);
+	
+	printf("size :%d running time : %f\n", size, end - start);
+
+	//printArray(arr, size);
+	free(arr);
+
+}
+
+//버블 정렬 -> O(n²)
+void bubble_sort(int arr[], int size)
+{
+	int i, j, temp;
+	double start, end;
+
+	//printArray(arr, size);
+	start = (double)clock() / CLOCKS_PER_SEC;
+	for (int i = size - 1; i > 0; i--)
+	{
+		for (int j = 0; j < i; j++) {
+			if (arr[j] > arr[j + 1])
+			{
+				SWAP(arr[j], arr[j + 1], temp);
+			}
+		}
+	}
+	end = (((double)clock()) / CLOCKS_PER_SEC);
+
+	printf("size :%d running time : %f\n", size, end - start);
+	//printArray(arr, size);
+	free(arr);
+}
+
+//병합 정렬 -> O(nlog2n)
+void merge_sort(int arr[], int left, int right, int sorted[])
+{
+	int mid;
+	if (left < right) {
+		mid = (left + right) / 2;
+		merge_sort(arr, left, mid, sorted);
+		merge_sort(arr, mid+1, right, sorted);
+		merge(arr, left, mid, right, sorted);
+	}
+}
+
+void merge(int arr[], int left, int mid, int right, int sorted[])
+{
+	int i, j, k, l;
+	i = left; j = mid + 1; k = left;
+
+	/* 분할 정렬된 list의 합병 */
+	while (i <= mid && j <= right) {
+		if (arr[i] <= arr[j])
+			sorted[k++] = arr[i++];
+		else
+			sorted[k++] = arr[j++];
+	}
+
+	// 남아 있는 값들을 일괄 복사
+	if (i > mid) {
+		for (l = j; l <= right; l++)
+			sorted[k++] = arr[l];
+	}
+	// 남아 있는 값들을 일괄 복사
+	else {
+		for (l = i; l <= mid; l++)
+			sorted[k++] = arr[l];
+	}
+
+	// 배열 sorted[](임시 배열)의 리스트를 배열 list[]로 재복사
+	for (l = left; l <= right; l++) {
+		arr[l] = sorted[l];
+	}
+
+}
+
+//퀵 정렬 -> O(nlog2n)
+void quick_sort(int arr[], int start, int end) {
+
+	if (start >= end) { 
+		// 원소가 1개인 경우
+		return; 
+	} int pivot = start; 
+	int i = pivot + 1; // 왼쪽 출발 지점 
+	int j = end; // 오른쪽 출발 지점 
+	int temp; 
+
+	while(i <= j){ // 포인터가 엇갈릴때까지 반복 
+		while(i <= end && arr[i] <= arr[pivot]){
+			i++; 
+		} 
+		while(j > start && arr[j] >= arr[pivot]){
+			j--; 
+		} 
+		if(i > j){ // 엇갈림 
+			SWAP(arr[j], arr[pivot], temp);
+		}else{ // i번째와 j번째를 스왑 
+			SWAP(arr[i], arr[j], temp);
+		} 
+	} // 분할 계산 
+	quick_sort(arr, start, j - 1);
+	quick_sort(arr, j + 1, end);
+}
+
+void init(QueueType* q)
+{
+	q->front = q->rear = NULL;
+}
+
+int is_empty(QueueType* q)
+{
+	return (q->front == NULL);
+}
+
+void enqueue(QueueType* q, int item)
+{
+	QueueNode* node = (QueueNode*)malloc(sizeof(QueueNode));
+	if (node == NULL)
+		printf("큐가 비어있습니다.");
+	else {
+		node->item = item;
+		node->link = NULL;
+		if (is_empty(q)) {
+			q->front = node;
+			q->rear = node;
+		}
+		else {
+			q->rear->link = node;
+			q->rear = node;
+		}
+	}
+}
+
+int dequeue(QueueType* q)
+{
+	QueueNode* node = q->front;
+	int item;
+	if (is_empty(q))
+		printf("큐가 비어있습니다.");
+	else {
+		item = node->item;
+		q->front = q->front->link;
+		if (q->front == NULL) {
+			q->rear = NULL;
+		}
+		free(node);
+		return item;
+	}
+}
+
+void radix_sort(int arr[], int size)
+{
+	int i, b, d, factor = 1;
+	double start, end;
+	int digits = 0;
+	int temp = size;
+	QueueType queues[BUCKETS];
+
+	//printArray(arr, size);
+	start = (double)clock() / CLOCKS_PER_SEC;
+	for (b = 0; b < BUCKETS; b++)
+		init(&queues[b]);
+	
+	//자릿수를 구한다
+	while (1)
+	{
+		temp /= 10;
+		digits++;
+		if (!temp)
+		{
+			break;
+		}
+	}
+
+	for (d = 0; d < digits; d++)
+	{
+		for (i = 0; i < size; i++)
+			enqueue(&queues[(arr[i] / factor) % 10], arr[i]);
+
+		for (b = i = 0; b < BUCKETS; b++)
+			while (!is_empty(&queues[b]))
+				arr[i++] = dequeue(&queues[b]);
+		factor *= 10;
+	}
+	end = (((double)clock()) / CLOCKS_PER_SEC);
+
+	printf("size :%d running time : %f\n", size, end - start);
+	//printArray(arr, size);
+	free(arr);
+}
+
+void bucket_sort(int arr[], int size)
+{
+	double start, end;
+	//bucket_arr에 정렬하기
+	start = (double)clock() / CLOCKS_PER_SEC;
+	int i, j = 0;
+	int* count = (int*)malloc(sizeof(int) * (size+1));
+
+	//printArray(arr, size);
+	for (i = 0; i < size+1; i++)
+		count[i] = 0;
+
+	for (i = 0; i < size; i++)
+		count[arr[i]]++;
+
+	for (i = 0; i < size+1; i++)
+	{
+		for (; count[i] > 0; count[i]--)
+		{
+			arr[j++] = i;
+		}
+	}
+	end = (double)clock() / CLOCKS_PER_SEC;
+
+	printf("size :%d running time : %f\n", size, end - start);
+	//printArray(arr, size);
+	free(arr);
+}
